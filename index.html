@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>輪播導航</title>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css' />
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css' />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .slick-area {
+      width: 100%;
+      max-width: 500px;
+      padding: 15px;
+    }
+
+    .slick-area .slick-slide img {
+      border: 1px solid #ccc
+    }
+
+    .slick-nav .slick-slide {
+      padding: 3px;
+    }
+
+    .slick-nav .slick-slide img {
+      cursor: pointer;
+    }
+
+    @media (min-width: 576px) {
+      .slick-area {
+        width: 50%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="slick-area"></div>
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js'></script>
+
+  <script>
+    const slickArea = document.querySelector(".slick-area")
+
+    let slickNavCount = 4
+
+    const slickImgs = [
+      { type: 'img', src: 'https://picsum.photos/500/500/?random=1' },
+      { type: 'img', src: 'https://picsum.photos/500/500/?random=2' },
+      { type: 'img', src: 'https://picsum.photos/500/500/?random=3' },
+      { type: 'img', src: 'https://picsum.photos/500/500/?random=4' },
+      { type: 'img', src: 'https://picsum.photos/500/500/?random=5' },
+      { type: 'img', src: 'https://picsum.photos/500/500/?random=6' },
+      { type: 'img', src: 'https://picsum.photos/500/500/?random=7' },
+      { type: 'img', src: 'https://picsum.photos/500/500/?random=8' },
+      { type: 'img', src: 'https://picsum.photos/500/500/?random=9' },
+      { type: 'img', src: 'https://picsum.photos/500/500/?random=10' },
+    ]
+
+    const slickView = document.createElement('div');
+    slickView.classList.add('slick-view');
+
+    const slickNav = document.createElement('div');
+    slickNav.classList.add('slick-nav');
+
+    slickArea.append(slickView);
+
+
+    slickArea.append(slickNav);
+
+    slickImgs.forEach((item, i) => {
+      let slickItem;
+      if (item.type === 'img') {
+        slickItem = document.createElement('img');
+      } else {
+        slickItem = document.createElement('video');
+      }
+      slickItem.setAttribute('src', item.src);
+      let navItem = slickItem.cloneNode(true); // 複製一個新元素
+      slickView.append(slickItem);
+      slickNav.append(navItem);
+    });
+
+    $(".slick-view").slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      fade: true,
+      infinite: false,
+    });
+
+    $(".slick-nav").slick({
+      slidesToShow: 4,
+      slideToScroll: 1,
+      infinite: false,
+    });
+
+    $(".slick-view").on("afterChange", (event, slick, currentSlide) => {
+      let prevItem = $(".slick-nav").find('.slick-slide').eq(currentSlide).prev()
+      let nextItem = $(".slick-nav").find('.slick-slide').eq(currentSlide).next()
+      if (!prevItem.hasClass('slick-active')) {
+        $(".slick-nav").slick("slickGoTo", currentSlide - 1);
+      } else if (!nextItem.hasClass('slick-active')) {
+        $(".slick-nav").slick("slickGoTo", currentSlide - slickNavCount + 2);
+      }
+    });
+    $(".slick-nav").on("click", ".slick-slide", function (e) {
+      e.preventDefault();
+      const goToSlide = $(this).data("slick-index");
+
+      setTimeout(function () {
+        let prevItem = $(e.target).parents('.slick-slide').prev()
+        let nextItem = $(e.target).parents('.slick-slide').next()
+        if (!prevItem.hasClass('slick-active') && goToSlide > 0) {
+          $(".slick-nav").slick("slickGoTo", goToSlide - 1);
+        } else if (!nextItem.hasClass('slick-active') && goToSlide < slickImgs.length - 1) {
+          $(".slick-nav").slick("slickGoTo", goToSlide - slickNavCount + 2);
+        }
+
+      }, 100);
+      $(".slick-view").slick("slickGoTo", goToSlide);
+    });
+  </script>
+</body>
+
+</html>
